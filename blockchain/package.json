@@ -1,0 +1,14 @@
+{
+  "name": "agent-passport-blockchain",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "description": "Smart contracts for Agent Passport (Base Sepolia)",
+  "scripts": {
+    "compile": "hardhat compile",
+    "test": "hardhat test",
+    "deploy:base-sepolia": "hardhat run scripts/deploy.ts --network base-sepolia",
+    "verify": "hardhat verify"
+  },
+  "devDependencies": {}
+}

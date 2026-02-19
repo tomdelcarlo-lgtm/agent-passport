@@ -1,18 +1,38 @@
 "use client";
 
 import Link from "next/link";
-import { useRouter, usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
+import { useEffect } from "react";
+import { useAccount, useDisconnect } from "wagmi";
+import { ConnectButton } from "@rainbow-me/rainbowkit";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
+  const { isConnected, isConnecting } = useAccount();
+  const { disconnect } = useDisconnect();
   const router = useRouter();
   const pathname = usePathname();
 
-  async function handleLogout() {
-    await fetch("/api/auth/logout", { method: "POST" });
-    toast.success("Logged out");
-    router.push("/login");
+  // Redirect to home if wallet not connected
+  useEffect(() => {
+    if (!isConnecting && !isConnected) {
+      router.push("/");
+    }
+  }, [isConnected, isConnecting, router]);
+
+  if (isConnecting || !isConnected) {
+    return (
+      <div className="min-h-screen flex items-center justify-center text-muted-foreground">
+        Connecting wallet…
+      </div>
+    );
+  }
+
+  function handleDisconnect() {
+    disconnect();
+    toast.success("Wallet disconnected");
+    router.push("/");
   }
 
   return (
@@ -30,15 +50,21 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                 </Button>
               </Link>
               <Link href="/dashboard/notifications">
-                <Button variant={pathname === "/dashboard/notifications" ? "secondary" : "ghost"} size="sm">
+                <Button
+                  variant={pathname === "/dashboard/notifications" ? "secondary" : "ghost"}
+                  size="sm"
+                >
                   Notifications
                 </Button>
               </Link>
             </nav>
           </div>
-          <Button variant="ghost" size="sm" onClick={handleLogout}>
-            Logout
-          </Button>
+          <div className="flex items-center gap-2">
+            <ConnectButton showBalance={false} accountStatus="address" chainStatus="icon" />
+            <Button variant="ghost" size="sm" onClick={handleDisconnect}>
+              Disconnect
+            </Button>
+          </div>
         </div>
       </header>
       <main className="flex-1 container mx-auto px-4 py-6">{children}</main>

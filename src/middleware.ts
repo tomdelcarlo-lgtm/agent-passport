@@ -1,20 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getIronSession } from "iron-session";
-import { SessionData, sessionOptions } from "@/lib/session";
 
-export async function middleware(req: NextRequest) {
-  const res = NextResponse.next();
-
-  // Only protect /dashboard routes
-  if (req.nextUrl.pathname.startsWith("/dashboard")) {
-    const session = await getIronSession<SessionData>(req, res, sessionOptions);
-
-    if (!session.userId) {
-      return NextResponse.redirect(new URL("/login", req.url));
-    }
-  }
-
-  return res;
+// Wallet auth is client-side (wagmi/RainbowKit).
+// Dashboard pages protect themselves via useAccount() hook.
+// Middleware just passes all requests through.
+export function middleware(_req: NextRequest) {
+  return NextResponse.next();
 }
 
 export const config = {

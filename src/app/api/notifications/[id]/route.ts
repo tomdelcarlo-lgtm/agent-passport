@@ -1,48 +1,47 @@
+/**
+ * PATCH /api/notifications/[id]
+ *
+ * Update a notification's status to "approved" or "denied".
+ *
+ * For "approve": the on-chain grantPermission() tx was already sent by the client
+ *   (wagmi writeContract). This endpoint just marks the DB record as approved.
+ * For "deny": no on-chain tx needed. Just mark as denied in DB.
+ *   The /api/verify endpoint will return "denied" for future calls with this scope.
+ *
+ * Body: { action: "approve" | "deny", walletAddress: string }
+ */
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { getSession } from "@/lib/session";
 
-export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
-  const session = await getSession();
-  if (!session.userId) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+export async function PATCH(
+  req: NextRequest,
+  { params }: { params: Promise<{ id: string }> },
+) {
+  const { id } = await params;
+  const { action, walletAddress } = await req.json();
+
+  if (action !== "approve" && action !== "deny") {
+    return NextResponse.json({ error: "action must be 'approve' or 'deny'" }, { status: 400 });
   }
 
-  const { id } = await params;
+  if (!walletAddress) {
+    return NextResponse.json({ error: "walletAddress is required" }, { status: 400 });
+  }
+
   const notification = await prisma.notification.findFirst({
-    where: { id, userId: session.userId, status: "pending" },
+    where: { id, walletAddress: walletAddress.toLowerCase(), status: "pending" },
   });
 
   if (!notification) {
-    return NextResponse.json({ error: "Notification not found or already resolved" }, { status: 404 });
+    return NextResponse.json(
+      { error: "Notification not found or already resolved" },
+      { status: 404 },
+    );
   }
 
-  const { action } = await req.json(); // "approve" or "deny"
-
-  if (action !== "approve" && action !== "deny") {
-    return NextResponse.json({ error: "Action must be 'approve' or 'deny'" }, { status: 400 });
-  }
-
-  const granted = action === "approve";
-
-  // Update notification status
   await prisma.notification.update({
     where: { id },
-    data: { status: granted ? "approved" : "denied" },
-  });
-
-  // Create or update the permission
-  await prisma.permission.upsert({
-    where: {
-      agentId_scope: { agentId: notification.agentId, scope: notification.scope },
-    },
-    update: { granted, service: notification.service },
-    create: {
-      agentId: notification.agentId,
-      scope: notification.scope,
-      service: notification.service,
-      granted,
-    },
+    data: { status: action === "approve" ? "approved" : "denied" },
   });
 
   return NextResponse.json({ ok: true, action, scope: notification.scope });
