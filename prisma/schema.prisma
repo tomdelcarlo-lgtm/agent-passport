@@ -1,0 +1,72 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id            String         @id @default(cuid())
+  email         String         @unique
+  name          String
+  passwordHash  String
+  createdAt     DateTime       @default(now())
+  agents        Agent[]
+  notifications Notification[]
+}
+
+model Agent {
+  id          String       @id @default(cuid())
+  name        String
+  description String       @default("")
+  apiKeyHash  String
+  keyPrefix   String
+  active      Boolean      @default(true)
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+  userId      String
+  user        User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  permissions Permission[]
+  verifyLogs  VerifyLog[]
+  notifications Notification[]
+}
+
+model Permission {
+  id        String   @id @default(cuid())
+  scope     String
+  service   String   @default("")
+  granted   Boolean  @default(true)
+  createdAt DateTime @default(now())
+  agentId   String
+  agent     Agent    @relation(fields: [agentId], references: [id], onDelete: Cascade)
+
+  @@unique([agentId, scope])
+}
+
+model VerifyLog {
+  id        String   @id @default(cuid())
+  scope     String
+  service   String   @default("")
+  status    String   // "allowed", "denied", "pending_approval", "agent_inactive", "invalid_key"
+  ip        String   @default("")
+  createdAt DateTime @default(now())
+  agentId   String
+  agent     Agent    @relation(fields: [agentId], references: [id], onDelete: Cascade)
+}
+
+model Notification {
+  id        String   @id @default(cuid())
+  scope     String
+  service   String   @default("")
+  status    String   @default("pending") // "pending", "approved", "denied"
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  agentId   String
+  agent     Agent    @relation(fields: [agentId], references: [id], onDelete: Cascade)
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([agentId, scope, status])
+}
