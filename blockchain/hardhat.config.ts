@@ -50,11 +50,23 @@ export default defineConfig({
     cache: "./cache",
   },
   networks: {
-    "base-sepolia": {
+    // ── Local development (default) ────────────────────────────────────────
+    // Started by: npm run dev:local  (runs `hardhat node` automatically)
+    localhost: {
       type: "http",
-      url: process.env.BASE_SEPOLIA_RPC_URL ?? "https://sepolia.base.org",
-      accounts: privateKey ? [privateKey] : [],
-      chainId: 84532,
+      url: "http://127.0.0.1:8545",
+      chainId: 31337,
     },
+
+    // ── Base Sepolia testnet ────────────────────────────────────────────────
+    // Uncomment when you have testnet ETH.
+    // Get ETH: https://www.coinbase.com/faucets/base-ethereum-sepolia-faucet
+    //
+    // "base-sepolia": {
+    //   type: "http",
+    //   url: process.env.BASE_SEPOLIA_RPC_URL ?? "https://sepolia.base.org",
+    //   accounts: privateKey ? [privateKey] : [],
+    //   chainId: 84532,
+    // },
   },
 });

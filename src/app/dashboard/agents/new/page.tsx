@@ -117,7 +117,7 @@ export default function NewAgentPage() {
         <CardHeader>
           <CardTitle>Create Agent</CardTitle>
           <CardDescription>
-            This registers a new AI agent passport on Base Sepolia. You&apos;ll sign one
+            This registers a new AI agent passport on-chain. You&apos;ll sign one
             transaction with MetaMask, then receive an off-chain API key for verification.
           </CardDescription>
         </CardHeader>

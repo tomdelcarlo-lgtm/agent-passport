@@ -7,14 +7,16 @@
  */
 import { NextRequest, NextResponse } from "next/server";
 import { createPublicClient, http } from "viem";
-import { baseSepolia } from "viem/chains";
+import { hardhat } from "viem/chains";
+// import { base } from "viem/chains"; // ← uncomment for Base mainnet
 import { prisma } from "@/lib/prisma";
 import { generateApiKey, getKeyPrefix, hashApiKey } from "@/lib/api-keys";
 import { AGENT_PASSPORT_ABI, AGENT_PASSPORT_ADDRESS } from "@/lib/contract";
 
 const publicClient = createPublicClient({
-  chain: baseSepolia,
-  transport: http(process.env.BASE_SEPOLIA_RPC_URL ?? "https://sepolia.base.org"),
+  chain: hardhat,
+  // chain: base, // ← uncomment for Base mainnet
+  transport: http(process.env.RPC_URL ?? "http://127.0.0.1:8545"),
 });
 
 export async function POST(

@@ -1,14 +1,14 @@
 "use client";
 
 import "@rainbow-me/rainbowkit/styles.css";
-import { RainbowKitProvider, darkTheme, midnightTheme } from "@rainbow-me/rainbowkit";
+import { RainbowKitProvider, midnightTheme } from "@rainbow-me/rainbowkit";
 import { WagmiProvider } from "wagmi";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { wagmiConfig } from "@/lib/wagmi";
 import { useState } from "react";
 
 export function Providers({ children }: { children: React.ReactNode }) {
-  // useState ensures QueryClient is not shared across requests in SSR
+  // useState ensures QueryClient is not shared across requests
   const [queryClient] = useState(() => new QueryClient());
 
   return (

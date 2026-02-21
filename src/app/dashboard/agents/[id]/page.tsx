@@ -80,12 +80,12 @@ export default function AgentDetailPage({ params }: { params: Promise<{ id: stri
 
   // Redirect if agent doesn't exist or caller is not the owner
   useEffect(() => {
-    if (
-      agent &&
-      address &&
-      agent.owner !== "0x0000000000000000000000000000000000000000" &&
-      agent.owner.toLowerCase() !== address.toLowerCase()
-    ) {
+    if (!agent) return;
+    if (agent.owner === "0x0000000000000000000000000000000000000000") {
+      router.push("/dashboard");
+      return;
+    }
+    if (address && agent.owner.toLowerCase() !== address.toLowerCase()) {
       toast.error("You don't own this agent");
       router.push("/dashboard");
     }
@@ -178,13 +178,8 @@ export default function AgentDetailPage({ params }: { params: Promise<{ id: stri
     }
   }
 
-  if (!agent) {
+  if (!agent || agent.owner === "0x0000000000000000000000000000000000000000") {
     return <div className="flex justify-center py-20 text-muted-foreground">Loading agent…</div>;
-  }
-
-  if (agent.owner === "0x0000000000000000000000000000000000000000") {
-    router.push("/dashboard");
-    return null;
   }
 
   const statusColor = agent.active ? "bg-emerald-500" : "bg-gray-400";

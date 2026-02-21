@@ -2,7 +2,7 @@
  * GET /api/verify?key=ap_XXX&scope=email:read&service=myapp
  *
  * Verifies an AI agent's permission to perform a given scope.
- * Source of truth: AgentPassport smart contract on Base Sepolia.
+ * Source of truth: AgentPassport smart contract (local hardhat node by default).
  * API key hash: off-chain SQLite (secrets can't go on-chain).
  *
  * Flow:
@@ -14,7 +14,8 @@
  */
 import { NextRequest, NextResponse } from "next/server";
 import { createPublicClient, http } from "viem";
-import { baseSepolia } from "viem/chains";
+import { hardhat } from "viem/chains";
+// import { base } from "viem/chains"; // ← uncomment for Base mainnet
 import { prisma } from "@/lib/prisma";
 import { verifyApiKey } from "@/lib/api-keys";
 import { AGENT_PASSPORT_ABI, AGENT_PASSPORT_ADDRESS } from "@/lib/contract";
@@ -22,8 +23,10 @@ import { AGENT_PASSPORT_ABI, AGENT_PASSPORT_ADDRESS } from "@/lib/contract";
 // ─── Contract client ──────────────────────────────────────────────────────────
 
 const publicClient = createPublicClient({
-  chain: baseSepolia,
-  transport: http(process.env.BASE_SEPOLIA_RPC_URL ?? "https://sepolia.base.org"),
+  chain: hardhat,
+  transport: http(process.env.RPC_URL ?? "http://127.0.0.1:8545"),
+  // For Base mainnet, set RPC_URL=https://mainnet.base.org (or your Alchemy/Infura URL)
+  // and swap chain to base above.
 });
 
 // ─── Rate limiter ─────────────────────────────────────────────────────────────

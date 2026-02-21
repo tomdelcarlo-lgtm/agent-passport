@@ -7,11 +7,15 @@
     "build": "next build --turbopack",
     "start": "next start",
     "lint": "eslint",
+    "dev:local": "bash scripts/dev-local.sh",
     "compile": "cd blockchain && npx hardhat compile",
     "test:contracts": "cd blockchain && npx hardhat test",
-    "deploy:base-sepolia": "cd blockchain && npx hardhat run scripts/deploy.ts --network base-sepolia"
+    "deploy:local": "cd blockchain && npx hardhat run scripts/deploy-local.ts --network localhost",
+    "deploy:base-sepolia": "cd blockchain && npx hardhat run scripts/deploy.ts --network base-sepolia",
+    "hardhat:stop": "bash scripts/hardhat-stop.sh"
   },
   "dependencies": {
+    "@metamask/sdk": "^0.34.0",
     "@prisma/client": "^6.19.2",
     "@rainbow-me/rainbowkit": "^2.2.10",
     "@tanstack/react-query": "^5.90.21",
@@ -31,7 +35,7 @@
     "tailwind-merge": "^3.4.1",
     "uuid": "^13.0.0",
     "viem": "^2.46.2",
-    "wagmi": "^3.5.0"
+    "wagmi": "^2.19.5"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",
