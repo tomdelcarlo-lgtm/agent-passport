@@ -274,3 +274,7 @@ npm run deploy:base-mainnet
 ## License
 
 MIT
+
+## Build note
+
+This project was built with **Claude Code**.
